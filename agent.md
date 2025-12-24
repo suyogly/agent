@@ -62,3 +62,5 @@ Modules used: langchain, dotenv, langchain-google-genai
 <br>
 
 > But I don't know why I had to type the user intent 2 times for the answer.
+
+-> **Fixed**: Because I was calling user() two times, once in main() and once in the while loop. Fixed it by storing the user input in a variable.
