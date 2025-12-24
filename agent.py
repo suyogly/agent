@@ -33,6 +33,3 @@ if __name__ == "__main__":
     while True:
         print(main())
 
-        if user() == "exit":
-            break
-
