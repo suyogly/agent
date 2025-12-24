@@ -14,7 +14,7 @@ Chronological documentation to develop and learn the agent by starting simple, t
 
 # Journey
 
-## Step 1 : Simple CLI-based AI chat that answers, nothing more.
+## Step 1 : Simple CLI-based AI chat that answers, nothing more. (*done*)
 Date: 24th December, 2025
 Modules used: langchain, dotenv, langchain-google-genai
 <details>
