@@ -7,6 +7,7 @@ Chronological documentation to develop and learn the agent by starting simple, t
 - Step 3: Adding tool/s, probably Weather, Calculator, News, Arxiv, Wikipidea, etc.
 - Step 4: Creating Endpoint using FastAPI.
 - Step 5: Adding GUI using Streamlit or Gradio or just vibecoded site.
+- Step 5.5: Deploying the app using Render or Fly.io or Vercel.
 - Step 6: Adding the RAG for pdfs using Vector store.
 - Step 7: Adding multiple agents, proly a Research Agent
 - Step 8: Adding MCP server.
