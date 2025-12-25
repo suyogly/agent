@@ -2,4 +2,7 @@ langchain
 langchain-classic
 langchain-google-genai
 langchain-groq
+langchain-tavily
+langchain-classic
+
 dotenv
