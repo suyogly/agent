@@ -119,3 +119,5 @@ Modules used: langchain, dotenv, langchain-groq
 
 > **Problem**: Getting "None" value while appending to the History, and getting response on List.<br>
 **Solved**: pretty_print() gives the None value when passed, so I used .content, and removed memory() function to avoid responses on list. Added .append inside main().
+
+sadly nothing today.
