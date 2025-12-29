@@ -1,21 +1,31 @@
 from langchain_groq import ChatGroq
 from langchain.agents import create_agent
-from langchain_tavily import TavilySearch
 from weather import get_weather_info
+from arxiv_retriever import arxiv_search
 from langchain.tools import tool
 from dotenv import load_dotenv
 
 load_dotenv()
-def get_city():
-    name = input("Enter the name of the city: ")
-    return name
+
+def intent():
+    query = input("what do you want to know? ")
+    return query
+
 
 @tool("weather")
-def weather_tool():
+def weather_tool(query):
     '''
     Searches weather for the specified city.
     '''
-    res = get_weather_info(name=get_city())
+    res = get_weather_info(query)
+    return res
+
+@tool("arxiv_paper_search")
+def arxiv_papers(query):
+    '''
+    This tool searches the arxiv papers from user intent, only give the fetched papers, and a short 2 line description. NO other information.
+    '''
+    res = arxiv_search(query)
     return res
 
 model = ChatGroq(
@@ -26,14 +36,14 @@ model = ChatGroq(
 agent = create_agent(
         model=model,
         system_prompt="you are a helpful, but only answers in long when necessary.",
-        tools=[weather_tool]
+        tools=[weather_tool, arxiv_papers]
     )
 
 res = agent.invoke(
     {
             "messages": [
                 {"role": "user",
-                "content": get_city()}
+                "content": intent()}
             ]
         }
 )
