@@ -15,7 +15,7 @@ def get_cordinates(name):
 
     response = requests.get(cord_url, params=parameters)
     r = response.json()
-
+    # print(r)
     res = r['results'][0]
     latitude = res['latitude']
     longitude = res['longitude']

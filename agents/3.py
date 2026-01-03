@@ -17,7 +17,7 @@ def weather_tool(query):
     '''
     Searches weather for the specified city.
     '''
-    res = get_weather_info(query)
+    res = get_weather_info(name=query)
     return res
 
 @tool("arxiv_paper_search")

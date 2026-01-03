@@ -9,3 +9,5 @@ dotenv
 pyowm
 arxiv
 pymupdf
+
+fastapi[standard]
