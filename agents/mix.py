@@ -28,24 +28,26 @@ def arxiv_papers(query):
     res = arxiv_search(query)
     return res
 
-model = ChatGroq(
-    model="openai/gpt-oss-120b",
-    temperature=0.2
-)
-
-agent = create_agent(
-        model=model,
-        system_prompt="you are a helpful, but only answers in long when necessary.",
-        tools=[weather_tool, arxiv_papers]
+def llm():
+    model = ChatGroq(
+        model="openai/gpt-oss-120b",
+        temperature=0.2
     )
 
-res = agent.invoke(
-    {
-            "messages": [
-                {"role": "user",
-                "content": intent()}
-            ]
-        }
-)
+    agent = create_agent(
+            model=model,
+            system_prompt="you are a helpful, but only answers in long when necessary.",
+            tools=[weather_tool, arxiv_papers]
+        )
+    return agent
 
-print(res["messages"][-1].content)
+def result():
+    res = llm().invoke(
+        {
+                "messages": [
+                    {"role": "user",
+                    "content": intent()}
+                ]
+            }
+    )
+    return res["messages"][-1].content
