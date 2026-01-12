@@ -1,35 +1,58 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Body
+from langchain_groq import ChatGroq
+from langchain.agents import create_agent
+from weather import get_weather_info
+from arxiv_retriever import arxiv_search
+from langchain.tools import tool
+from dotenv import load_dotenv
 
-app = FastAPI()
+load_dotenv()
 
-@app.get("/")
-def home():
-    return {"message": "Welcome to my Book API!"}
+# --- Tools and Setup ---
+@tool("weather")
+def weather_tool(query):
+    '''Searches weather for the specified city.'''
+    return get_weather_info(name=query)
 
-# Our fake database (for now)
-books_db = {
-    1: {"id": 1, "title": "The Hobbit", "author": "J.R.R. Tolkien", "year": 1937},
-    2: {"id": 2, "title": "1984", "author": "George Orwell", "year": 1949},
-    3: {"id": 3, "title": "Dune", "author": "Frank Herbert", "year": 1965}
-}
+@tool("arxiv_paper_search")
+def arxiv_papers(query):
+    '''Searches arxiv papers; gives fetched papers and a 2-line description.'''
+    return arxiv_search(query)
 
-@app.get("/books/{book_id}")
-def get_book(book_id: int):
-    if book_id in books_db:
-        return books_db[book_id]
-    else:
-        return {"error": "Book not found"}
+# Initialize the agent globally once
+model = ChatGroq(model="openai/gpt-oss-120b", temperature=0.2)
+agent = create_agent(
+    model=model,
+    system_prompt="you are a helpful, but only answers in long when necessary.",
+    tools=[weather_tool, arxiv_papers]
+)
 
+# --- FastAPI Configuration ---
+app = FastAPI(title="LangChain Agent API")
 
-@app.get("/authors/{author_name}/books/{book_id}")
-def get_author_book(author_name: str, book_id: int):
+@app.post("/ask")
+async def ask_agent(payload: dict = Body(...)):
+    """
+    Takes a JSON body like: {"query": "What is the weather in London?"}
+    """
+    # 1. Extract the input (without Pydantic validation)
+    user_query = payload.get("query", "Hello")
+    
+    # 2. Invoke the agent asynchronously
+    res = await agent.ainvoke(
+        {
+            "messages": [
+                {"role": "user", "content": user_query}
+            ]
+        }
+    )
+    
+    # 3. Return final message content as JSON
     return {
-        "author": author_name,
-        "book_id": book_id,
-        "message": f"Getting book {book_id} by {author_name}"
+        "reply": res["messages"][-1].content,
+        "status": "success"
     }
 
-
-@app.get("/about")
-def about():
-    return {"message": "This API helps you manage your book collection"}
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
