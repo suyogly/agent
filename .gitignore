@@ -7,3 +7,10 @@ env/
 build/
 dist/
 .env
+.idea/
+.vscode/
+*.log
+.DS_Store
+*.sqlite3
+*.db
+coverage/
