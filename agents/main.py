@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Body
+from fastapi.responses import StreamingResponse
 from langchain_groq import ChatGroq
 from langchain.agents import create_agent
 from weather import get_weather_info
@@ -20,7 +21,7 @@ def arxiv_papers(query):
     return arxiv_search(query)
 
 # Initialize the agent globally once
-model = ChatGroq(model="openai/gpt-oss-120b", temperature=0.2)
+model = ChatGroq(model="openai/gpt-oss-120b", temperature=0.2, streaming=True)
 agent = create_agent(
     model=model,
     system_prompt="you are a helpful, but only answers in long when necessary.",
@@ -38,20 +39,16 @@ async def ask_agent(payload: dict = Body(...)):
     # 1. Extract the input (without Pydantic validation)
     user_query = payload.get("query", "Hello")
     
-    # 2. Invoke the agent asynchronously
-    res = await agent.ainvoke(
-        {
+    async def event_stream():
+        async for chunk in agent.astream_events({
             "messages": [
                 {"role": "user", "content": user_query}
             ]
-        }
-    )
+        }):
+            yield str(chunk) + "\n"
+            print(chunk)  # Log to console for debugging
     
-    # 3. Return final message content as JSON
-    return {
-        "reply": res["messages"][-1].content,
-        "status": "success"
-    }
+    return StreamingResponse(event_stream(), media_type="text/plain")
 
 if __name__ == "__main__":
     import uvicorn
