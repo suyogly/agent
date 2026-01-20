@@ -11,3 +11,5 @@ arxiv
 pymupdf
 
 fastapi[standard]
+
+tiktoken
